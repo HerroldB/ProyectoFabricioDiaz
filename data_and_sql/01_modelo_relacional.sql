@@ -1,5 +1,5 @@
--- Modelo inicial para practicar la carga del dataset Telco Customer Churn.
--- Ejecutar en una base PostgreSQL de prueba.
+-- Armé estas tablas para practicar con el dataset Telco Customer Churn.
+-- Las preparé para PostgreSQL; en clase usamos pgAdmin 4 para ejecutar y leer SQL.
 
 CREATE TABLE IF NOT EXISTS dim_customer (
     customer_id VARCHAR(30) PRIMARY KEY,
@@ -30,4 +30,3 @@ CREATE TABLE IF NOT EXISTS fact_subscription (
     CONSTRAINT fk_fact_customer
         FOREIGN KEY (customer_id) REFERENCES dim_customer(customer_id)
 );
-
