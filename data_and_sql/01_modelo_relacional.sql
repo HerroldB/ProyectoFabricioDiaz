@@ -1,5 +1,7 @@
 -- Preparé estas tablas para el proyecto de Telco Customer Churn.
 -- Este script es para MySQL y lo ejecuté desde MySQL Workbench.
+-- El CSV de referencia está en:
+-- https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
 
 CREATE DATABASE IF NOT EXISTS churn_pp2;
 USE churn_pp2;
