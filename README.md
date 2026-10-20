@@ -1,6 +1,6 @@
 # Sistema predictivo de retención de clientes
 
-En este proyecto trabajé con el dataset Telco Customer Churn. Primero cargué y revisé los datos. Después limpié algunas columnas, comparé tres modelos y preparé las tablas para MySQL. En la segunda parte calculé qué umbral de probabilidad daría el mayor valor económico esperado para una campaña de retención.
+En este proyecto trabajé con el dataset Telco Customer Churn. Primero cargué y revisé los datos. Después limpié algunas columnas, comparé tres modelos y preparé las tablas para MySQL. En la segunda parte preparé el cálculo para encontrar qué umbral de probabilidad daría el mayor valor económico esperado para una campaña de retención.
 
 ## Archivos
 
