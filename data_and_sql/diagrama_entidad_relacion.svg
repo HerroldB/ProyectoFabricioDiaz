@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760">
+  <rect width="1120" height="760" fill="#fff"/>
+  <text x="560" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="bold" fill="#183153">Diagrama Entidad-Relación — churn_pp2</text>
+  <line x1="490" y1="175" x2="630" y2="175" stroke="#456b8a" stroke-width="3"/>
+  <text x="505" y="162" font-family="Arial, sans-serif" font-size="16" fill="#183153">1</text>
+  <text x="612" y="162" font-family="Arial, sans-serif" font-size="16" fill="#183153">1</text>
+  <text x="560" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#183153">una fila por cliente</text>
+  <rect x="60" y="90" width="430" height="265" rx="8" fill="#eef5fb" stroke="#2b5d87" stroke-width="2"/>
+  <text x="275" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="bold" fill="#183153">dim_customer</text>
+  <text x="85" y="170" font-family="Arial, sans-serif" font-size="16" fill="#263746">PK customer_id VARCHAR(20)</text>
+  <text x="85" y="208" font-family="Arial, sans-serif" font-size="16" fill="#263746">gender VARCHAR(20)</text>
+  <text x="85" y="246" font-family="Arial, sans-serif" font-size="16" fill="#263746">senior_citizen TINYINT</text>
+  <text x="85" y="284" font-family="Arial, sans-serif" font-size="16" fill="#263746">partner VARCHAR(10)</text>
+  <text x="85" y="322" font-family="Arial, sans-serif" font-size="16" fill="#263746">dependents VARCHAR(10)</text>
+  <rect x="630" y="90" width="430" height="620" rx="8" fill="#f5f8fb" stroke="#2b5d87" stroke-width="2"/>
+  <text x="845" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="bold" fill="#183153">fact_subscription</text>
+  <text x="655" y="170" font-family="Arial, sans-serif" font-size="16" fill="#263746">PK/FK customer_id VARCHAR(20)</text>
+  <text x="655" y="208" font-family="Arial, sans-serif" font-size="16" fill="#263746">tenure SMALLINT</text>
+  <text x="655" y="246" font-family="Arial, sans-serif" font-size="16" fill="#263746">phone_service VARCHAR(30)</text>
+  <text x="655" y="284" font-family="Arial, sans-serif" font-size="16" fill="#263746">multiple_lines VARCHAR(40)</text>
+  <text x="655" y="322" font-family="Arial, sans-serif" font-size="16" fill="#263746">internet_service VARCHAR(40)</text>
+  <text x="655" y="360" font-family="Arial, sans-serif" font-size="16" fill="#263746">online_security VARCHAR(40)</text>
+  <text x="655" y="398" font-family="Arial, sans-serif" font-size="16" fill="#263746">online_backup VARCHAR(40)</text>
+  <text x="655" y="436" font-family="Arial, sans-serif" font-size="16" fill="#263746">device_protection VARCHAR(40)</text>
+  <text x="655" y="474" font-family="Arial, sans-serif" font-size="16" fill="#263746">tech_support VARCHAR(40)</text>
+  <text x="655" y="512" font-family="Arial, sans-serif" font-size="16" fill="#263746">streaming_tv VARCHAR(40)</text>
+  <text x="655" y="550" font-family="Arial, sans-serif" font-size="16" fill="#263746">streaming_movies VARCHAR(40)</text>
+  <text x="655" y="588" font-family="Arial, sans-serif" font-size="16" fill="#263746">contract VARCHAR(40), payment_method VARCHAR(60)</text>
+  <text x="655" y="626" font-family="Arial, sans-serif" font-size="16" fill="#263746">paperless_billing, monthly_charges, total_charges</text>
+  <text x="655" y="664" font-family="Arial, sans-serif" font-size="16" fill="#263746">churn TINYINT (1 = se fue, 0 = se quedó)</text>
+</svg>
