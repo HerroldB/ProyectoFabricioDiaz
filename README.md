@@ -19,9 +19,9 @@ En este proyecto trabajé con el dataset Telco Customer Churn. Primero cargué y
 
 1. Conectate a tu servidor desde MySQL Workbench.
 2. Abrí y ejecutá `data_and_sql/01_modelo_relacional.sql` para crear la base y las tablas.
-3. Ejecutá `02_cargar_dim_customer.sql`.
-4. Ejecutá `03_cargar_fact_subscription_1.sql` y después `04_cargar_fact_subscription_2.sql`.
-5. Ejecutá `05_consultas.sql` para revisar los conteos y algunos datos.
+3. Ejecutá `data_and_sql/02_cargar_dim_customer.sql`.
+4. Ejecutá `data_and_sql/03_cargar_fact_subscription_1.sql` y después `data_and_sql/04_cargar_fact_subscription_2.sql`.
+5. Ejecutá `data_and_sql/05_consultas.sql` para revisar los conteos y algunos datos.
 
 El archivo 01 crea la estructura. El archivo 02 carga los 7.043 clientes; los archivos 03 y 04 cargan las 7.043 suscripciones en dos partes. La celda `CARGAR_EN_MYSQL = False` del notebook deja apagada la conexión desde Colab, así que ejecutar el notebook por sí solo no llena MySQL Workbench.
 
