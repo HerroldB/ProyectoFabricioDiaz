@@ -1,4 +1,4 @@
--- Usé estas consultas para revisar que las tablas tuvieran datos.
+-- Estas consultas sirven para revisar que las tablas tengan datos.
 USE churn_pp2;
 
 -- Primero conté los registros de cada tabla.
