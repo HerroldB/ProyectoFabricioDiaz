@@ -1,5 +1,5 @@
--- Cargué la primera parte de los servicios, cargos y bajas.
--- Primero ejecuté 01_modelo_relacional.sql en MySQL Workbench.
+-- Este archivo carga la primera parte de los servicios, cargos y bajas.
+-- Ejecutá primero 01_modelo_relacional.sql y después 02_cargar_dim_customer.sql.
 USE churn_pp2;
 START TRANSACTION;
 
