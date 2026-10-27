@@ -4,7 +4,7 @@
   <line x1="490" y1="175" x2="630" y2="175" stroke="#456b8a" stroke-width="3"/>
   <text x="505" y="162" font-family="Arial, sans-serif" font-size="16" fill="#183153">1</text>
   <text x="612" y="162" font-family="Arial, sans-serif" font-size="16" fill="#183153">1</text>
-  <text x="560" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#183153">una fila por cliente</text>
+  <text x="560" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#183153">una fila por cliente</text>
   <rect x="60" y="90" width="430" height="265" rx="8" fill="#eef5fb" stroke="#2b5d87" stroke-width="2"/>
   <text x="275" y="125" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="bold" fill="#183153">dim_customer</text>
   <text x="85" y="170" font-family="Arial, sans-serif" font-size="16" fill="#263746">PK customer_id VARCHAR(20)</text>
