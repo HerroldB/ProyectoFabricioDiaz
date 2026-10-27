@@ -1,7 +1,6 @@
--- Preparé estas tablas para el proyecto de Telco Customer Churn.
--- Este script es para MySQL y lo ejecuté desde MySQL Workbench.
--- El CSV de referencia está en:
--- https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+-- Este archivo crea la estructura relacional en MySQL Workbench.
+-- Los registros están en 02_cargar_dim_customer.sql y en los dos archivos 03/04 de fact_subscription.
+-- La fuente de datos original es data_and_sql/Telco_Customer_Churn.csv.
 
 CREATE DATABASE IF NOT EXISTS churn_pp2;
 USE churn_pp2;
