@@ -4,20 +4,26 @@ En este proyecto trabajé con el dataset Telco Customer Churn. Primero cargué y
 
 ## Archivos
 
-- data_and_sql/01_modelo_relacional.sql: crea la base y las tablas en MySQL.
+- `data_and_sql/Telco_Customer_Churn.csv`: dejé una copia del CSV original de la cátedra.
+- `data_and_sql/01_modelo_relacional.sql`: crea la base y las tablas en MySQL.
+- `data_and_sql/02_cargar_dim_customer.sql`: carga los datos de los clientes.
+- `data_and_sql/03_cargar_fact_subscription_1.sql` y `04_cargar_fact_subscription_2.sql`: cargan las suscripciones, servicios, cargos y bajas.
+- `data_and_sql/05_consultas.sql`: consultas para revisar los datos.
+- `data_and_sql/diagrama_entidad_relacion.svg`: diagrama de las tablas.
 - notebooks/01_churn_baseline.ipynb: descarga y limpia los datos, compara los modelos y guarda las probabilidades.
 - notebooks/02_decision_financiera.ipynb: usa esas probabilidades para calcular el umbral y el resultado económico esperado.
 
 ## Cómo lo ejecuté
 
-### 1. Preparé las tablas en MySQL Workbench
+### 1. Cargué la base en MySQL Workbench
 
 1. Abrí MySQL Workbench y me conecté a mi servidor MySQL.
-2. Abrí data_and_sql/01_modelo_relacional.sql.
-3. Ejecuté el script completo.
-4. Revisé que aparecieran la base churn_pp2 y las tablas dim_customer y fact_subscription.
+2. Ejecuté `data_and_sql/01_modelo_relacional.sql` para crear la base y las tablas.
+3. Ejecuté `02_cargar_dim_customer.sql`.
+4. Ejecuté `03_cargar_fact_subscription_1.sql` y después `04_cargar_fact_subscription_2.sql`.
+5. Ejecuté `05_consultas.sql` para revisar los conteos y comparar algunos datos.
 
-Workbench es el programa que usé para escribir y ejecutar SQL; el servidor MySQL tiene que estar iniciado para que funcione.
+El archivo 01 crea la estructura. Los archivos 02, 03 y 04 cargan los 7.043 registros. La celda `CARGAR_EN_MYSQL = False` del notebook deja apagada la conexión desde Colab; por eso ejecutar el notebook por sí solo no llenaba la base de MySQL Workbench.
 
 ### 2. Preparé los datos y comparé los modelos en Google Colab
 
