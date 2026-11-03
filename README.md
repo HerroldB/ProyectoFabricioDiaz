@@ -49,6 +49,14 @@ El notebook 01 deja la carga a MySQL apagada por defecto. Para usarla, primero e
 
 Google Colab se ejecuta en otro equipo, así que no puede conectarse al localhost de mi computadora. Para cargar desde Colab necesito un servidor MySQL al que Colab pueda llegar. Si solo tengo MySQL instalado en mi computadora, puedo ejecutar esa celda desde Python en la misma computadora.
 
+## Prácticas SQL en MySQL Workbench
+
+Después de cargar `churn_pp2`, ejecutá [las consultas de Clase 3](data_and_sql/consultas_churn.sql). El filtro de contratos mensuales con cargos superiores a 50 y la ampliación a quienes pagan con cheque electrónico muestran cómo cambia la selección al combinar `AND` y `OR`.
+
+En [la práctica de Clase 4](data_and_sql/clase4_dml_transacciones.sql) se simulan un alta, un reajuste tarifario y un borrado. `COMMIT` confirma una transacción y `ROLLBACK` revierte sus cambios. Las simulaciones se revierten para conservar el dataset. La clave foránea de `fact_subscription` exige que cada suscripción tenga un cliente en `dim_customer`.
+
+La carga en MySQL Workbench se verificó con 7.043 clientes, 7.043 suscripciones y 1.869 bajas.
+
 ## Dataset
 
 El CSV tiene 7.043 filas y 21 columnas. Lo descargué desde el enlace que usa el script de la profesora:
