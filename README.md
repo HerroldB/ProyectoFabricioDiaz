@@ -57,6 +57,8 @@ En [la práctica de Clase 4](data_and_sql/clase4_dml_transacciones.sql) se simul
 
 La carga en MySQL Workbench se verificó con 7.043 clientes, 7.043 suscripciones y 1.869 bajas.
 
+Las [capturas de MySQL Workbench](data_and_sql/capturas/README.md) muestran las consultas, sus resultados y las verificaciones de las transacciones.
+
 ## Dataset
 
 El CSV tiene 7.043 filas y 21 columnas. Lo descargué desde el enlace que usa el script de la profesora:
