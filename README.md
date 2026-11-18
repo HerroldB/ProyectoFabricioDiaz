@@ -1,107 +1,102 @@
-# Sistema predictivo de retención de clientes
+# Proyecto de retención de clientes - PP2
 
-En este proyecto trabajé con el dataset Telco Customer Churn. Primero cargué y revisé los datos. Después limpié algunas columnas, comparé tres modelos y preparé las tablas para MySQL. En la segunda parte preparé el cálculo para encontrar qué umbral de probabilidad daría el mayor valor económico esperado para una campaña de retención.
+En este proyecto trabajé con el dataset Telco Customer Churn. Primero cargué y revisé el CSV. Después preparé una base relacional en MySQL, comparé tres modelos y usé sus probabilidades para simular una decisión de retención.
 
-## Archivos
+## Qué entregué
 
-- `data_and_sql/Telco_Customer_Churn.csv`: dejé una copia del CSV original de la cátedra.
-- `data_and_sql/01_modelo_relacional.sql`: crea la base y las tablas en MySQL.
-- `data_and_sql/02_cargar_dim_customer.sql`: carga los datos de los clientes.
-- `data_and_sql/03_cargar_fact_subscription_1.sql` y `04_cargar_fact_subscription_2.sql`: cargan las suscripciones, servicios, cargos y bajas.
-- `data_and_sql/05_consultas.sql`: consultas para revisar los datos.
-- `data_and_sql/diagrama_entidad_relacion.svg`: diagrama de las tablas.
-- notebooks/01_churn_baseline.ipynb: descarga y limpia los datos, compara los modelos y guarda las probabilidades.
-- notebooks/02_decision_financiera.ipynb: usa esas probabilidades para calcular el umbral y el resultado económico esperado.
+- Los scripts para crear y cargar las tablas en MySQL Workbench.
+- El CSV original de la cátedra y el diagrama relacional.
+- Dos notebooks para la limpieza, comparación de modelos y decisión financiera.
+- Un script Python que genera los tres gráficos pedidos en la clase 5.
+- El informe técnico en PDF y el pitch de siete diapositivas.
 
-## Cómo lo ejecuté
+## Cómo cargar la base en MySQL Workbench
 
-### 1. Cómo cargar la base en MySQL Workbench
+1. Descargá `data_and_sql/Telco_Customer_Churn.csv` desde este repositorio.
+2. Abrí `data_and_sql/01_modelo_relacional.sql` en MySQL Workbench y ejecutá el archivo completo. Se crean la base `churn_db`, la tabla temporal `stg_telco` y las cuatro tablas finales.
+3. En el panel Schemas, hacé clic derecho sobre `stg_telco` y elegí **Table Data Import Wizard**. Seleccioná el CSV. Los encabezados del archivo coinciden con las columnas de la tabla.
+4. Abrí y ejecutá `data_and_sql/02_normalizar_datos.sql`. Este paso copia los datos a las tablas finales y convierte los 11 cargos totales vacíos en cero.
+5. Ejecutá `data_and_sql/05_consultas.sql`. Después de cargar y normalizar, deberían aparecer 7.043 filas en cada tabla final y cero relaciones sin cliente.
+6. Abrí `data_and_sql/consultas_churn.sql` y `data_and_sql/clase4_dml_transacciones.sql` para las prácticas.
 
-1. Conectate a tu servidor desde MySQL Workbench.
-2. Abrí y ejecutá `data_and_sql/01_modelo_relacional.sql` para crear la base y las tablas.
-3. Ejecutá `data_and_sql/02_cargar_dim_customer.sql`.
-4. Ejecutá `data_and_sql/03_cargar_fact_subscription_1.sql` y después `data_and_sql/04_cargar_fact_subscription_2.sql`.
-5. Ejecutá `data_and_sql/05_consultas.sql` para revisar los conteos y algunos datos.
+Las tablas finales son `clientes`, `servicios`, `facturacion` y `registro_churn`. Cada una conserva un tema y tiene una clave foránea hacia `clientes`. En `servicios`, `facturacion` y `registro_churn` dejé un registro por cliente.
 
-El archivo 01 crea la estructura. El archivo 02 carga los 7.043 clientes; los archivos 03 y 04 cargan las 7.043 suscripciones en dos partes. La celda `CARGAR_EN_MYSQL = False` del notebook deja apagada la conexión desde Colab, así que ejecutar el notebook por sí solo no llena MySQL Workbench.
+## Cómo correr los notebooks
 
-### 2. Preparé los datos y comparé los modelos en Google Colab
+1. Abrí `notebooks/01_churn_baseline.ipynb` en Google Colab y ejecuté las celdas en orden. El notebook descarga el mismo CSV que usa el script de la profesora.
+2. Al final se guarda `predicciones_para_revision.csv`. Lo descargué desde Colab.
+3. Abrí `notebooks/02_decision_financiera.ipynb`, subí ese archivo y ejecuté las celdas.
 
-1. Abrí notebooks/01_churn_baseline.ipynb en Google Colab.
-2. Ejecuté las celdas en orden.
-3. El notebook descargó el CSV indicado en el material de la profesora, limpió los valores vacíos, comparó los modelos y guardó predicciones_para_revision.csv.
-4. Descargué ese CSV desde el panel de archivos de Colab.
+El notebook deja apagada por defecto la conexión de SQLAlchemy. Google Colab no puede llegar al `localhost` de mi computadora. Para usar esa opción, primero creé las tablas con el SQL, cambié `CARGAR_EN_MYSQL` a `True` y ejecuté el código desde la misma computadora que tiene MySQL o desde un servidor accesible. El código pide el host, usuario y contraseña; no guardé contraseñas en el repositorio. Para Workbench, seguí los pasos de importación de arriba. Usé una sola forma de carga por vez.
 
-Para comparar usé Regresión Logística, Random Forest y XGBoost. Los comparé con las mismas particiones y elegí el que tuvo mayor ROC AUC en validación. Después revisé sus métricas en el conjunto de prueba.
+## Hallazgos visuales y análisis financiero
 
-### 3. Calculé el umbral económico en Google Colab
+### Bajas por tipo de contrato
 
-1. Abrí notebooks/02_decision_financiera.ipynb.
-2. Subí predicciones_para_revision.csv cuando Colab lo pidió.
-3. Ejecuté las celdas en orden.
-4. El notebook buscó el umbral que daba el mayor valor neto esperado en validación y aplicó ese umbral al conjunto de prueba.
+![Tasa de bajas por contrato](notebooks/churn_por_contrato.png)
 
-La cuenta es una simulación. La consigna y el CSV no incluyen el costo real de una campaña, el margen de la empresa ni la probabilidad de éxito. Para que el código pudiera mostrar cómo funciona, dejé valores de ejemplo editables: costo 20, seis meses, margen 40 % y éxito de campaña 30 %. No son valores informados por la profesora ni resultados reales. Los puedo cambiar cuando tenga datos del negocio.
+En el CSV, se fue el 42,7 % de los clientes con contrato mensual. La tasa fue 11,3 % en contratos de un año y 2,8 % en contratos de dos años. El contrato mensual aparece como el grupo con más bajas; el gráfico muestra una relación, no prueba por sí solo que el contrato sea la causa.
 
-### 4. Carga con SQLAlchemy
+### Antigüedad
 
-El notebook 01 deja la carga a MySQL apagada por defecto. Para usarla, primero ejecuté el SQL en Workbench y después configuré el host, usuario y contraseña del servidor en Python. La carga usa SQLAlchemy y PyMySQL.
+![Distribución de antigüedad](notebooks/densidad_antiguedad.png)
 
-Google Colab se ejecuta en otro equipo, así que no puede conectarse al localhost de mi computadora. Para cargar desde Colab necesito un servidor MySQL al que Colab pueda llegar. Si solo tengo MySQL instalado en mi computadora, puedo ejecutar esa celda desde Python en la misma computadora.
+La tasa de baja fue 47,4 % entre quienes llevaban hasta 12 meses y 17,1 % entre quienes llevaban más de 12 meses. Por eso marcaría el primer año como una ventana para probar acciones de acompañamiento.
 
-## Prácticas SQL en MySQL Workbench
+### Matriz de decisiones de la clase
 
-Después de cargar `churn_pp2`, ejecutá [las consultas de Clase 3](data_and_sql/consultas_churn.sql). El filtro de contratos mensuales con cargos superiores a 50 y la ampliación a quienes pagan con cheque electrónico muestran cómo cambia la selección al combinar `AND` y `OR`.
+![Matriz de impacto financiero](notebooks/matriz_decision_financiera.png)
 
-En [la práctica de Clase 4](data_and_sql/clase4_dml_transacciones.sql) se simulan un alta, un reajuste tarifario y un borrado. `COMMIT` confirma una transacción y `ROLLBACK` revierte sus cambios. Las simulaciones se revierten para conservar el dataset. La clave foránea de `fact_subscription` exige que cada suscripción tenga un cliente en `dim_customer`.
-
-La carga en MySQL Workbench se verificó con 7.043 clientes, 7.043 suscripciones y 1.869 bajas.
-
-Las [capturas de MySQL Workbench](data_and_sql/capturas/README.md) muestran las consultas, sus resultados y las verificaciones de las transacciones.
-
-## Dataset
-
-El CSV tiene 7.043 filas y 21 columnas. Lo descargué desde el enlace que usa el script de la profesora:
-
-https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+La actividad asigna +280 dólares a una intervención exitosa, -50 a un contacto innecesario, -600 a perder un cliente sin intervenir y 0 a continuar normalmente. Estos valores son los de la consigna. No son resultados observados en el dataset.
 
 ## Diccionario de datos
 
-| Columna | Qué representa |
-|---|---|
-| customerID | Identificador del cliente. |
-| gender | Género informado. |
-| SeniorCitizen | Indicador 0/1 de adulto mayor. |
-| Partner | Si tiene pareja. |
-| Dependents | Si tiene personas dependientes. |
-| tenure | Antigüedad en meses. |
-| PhoneService | Si tiene servicio telefónico. |
-| MultipleLines | Si tiene varias líneas o si no corresponde. |
-| InternetService | Tipo de servicio de internet. |
-| OnlineSecurity | Si tiene seguridad en línea o si no corresponde. |
-| OnlineBackup | Si tiene respaldo en línea o si no corresponde. |
-| DeviceProtection | Si tiene protección de dispositivo o si no corresponde. |
-| TechSupport | Si tiene soporte técnico o si no corresponde. |
-| StreamingTV | Si tiene streaming de TV o si no corresponde. |
-| StreamingMovies | Si tiene streaming de películas o si no corresponde. |
-| Contract | Tipo de contrato. |
-| PaperlessBilling | Si usa facturación digital. |
-| PaymentMethod | Medio de pago. |
-| MonthlyCharges | Cargo mensual. |
-| TotalCharges | Cargos acumulados. Algunas filas vienen vacías. |
-| Churn | Si dejó el servicio: Yes o No. Fue la variable que intenté predecir. |
-
-## Matriz de decisión
-
-La decisión que analicé fue si convenía ofrecer una campaña de retención.
-
-| Decisión | El cliente se fue | El cliente se quedó |
+| Tabla | Campo | Qué significa |
 |---|---|---|
-| Contactarlo | La campaña podría conservar parte del margen si logra retenerlo; se resta el costo de contactar. | Se paga la campaña aunque el cliente se hubiera quedado. |
-| No contactarlo | No se paga la campaña y se puede perder el margen futuro. | No se paga la campaña. |
+| `clientes` | `id_cliente` | Identificador original del cliente. Es la clave primaria. |
+| `clientes` | `genero`, `adulto_mayor`, `pareja`, `dependientes` | Datos básicos del cliente. `adulto_mayor` usa 0 o 1. |
+| `servicios` | `id_servicio` | Identificador creado automáticamente por MySQL. |
+| `servicios` | `id_cliente`, `antiguedad_meses` | Cliente relacionado y meses que lleva con el servicio. |
+| `servicios` | `servicio_telefonico`, `multiples_lineas`, `servicio_internet` | Datos de teléfono, líneas e internet. |
+| `servicios` | `seguridad_online`, `respaldo_online`, `proteccion_dispositivo`, `soporte_tecnico` | Servicios adicionales de protección y soporte. |
+| `servicios` | `streaming_tv`, `streaming_peliculas` | Servicios de streaming. |
+| `facturacion` | `id_facturacion` | Identificador creado automáticamente por MySQL. |
+| `facturacion` | `id_cliente`, `tipo_contrato`, `facturacion_digital`, `metodo_pago` | Cliente, contrato, factura digital y forma de pago. |
+| `facturacion` | `cargo_mensual`, `cargo_total` | Cargo del mes y cargos acumulados del cliente. |
+| `registro_churn` | `id_registro` | Identificador creado automáticamente por MySQL. |
+| `registro_churn` | `id_cliente`, `churn` | Cliente y resultado: `Yes` si se fue, `No` si siguió. |
 
-Para cada cliente calculé el valor esperado de contactar así:
+Las columnas de `stg_telco` mantienen los nombres del CSV original para que Workbench pueda importar el archivo sin renombrarlos.
 
-probabilidad de churn × probabilidad de éxito × margen futuro estimado − costo de campaña
+## Modelos y resultados
 
-Probé distintos umbrales con los datos de validación y elegí el que dio el mayor valor neto esperado. Después usé ese umbral en el grupo de prueba. El resultado es una simulación, porque no tengo resultados observados de campañas reales. El notebook muestra el umbral, cuántos clientes contactaría, el valor esperado y un ROI simulado al ejecutarlo.
+Separé los datos en 60 % entrenamiento, 20 % validación y 20 % prueba, usando la semilla 42. Coloqué el sobremuestreo dentro del pipeline para que se aplicara solo al entrenamiento. Elegí por ROC AUC en validación porque quería comparar cómo ordenaban el riesgo sin depender de un único corte. XGBoost obtuvo el valor más alto, pero quedó muy cerca de Regresión Logística.
+
+| Modelo | ROC AUC en validación | Recall en validación |
+|---|---:|---:|
+| XGBoost | 0,839 | 0,791 |
+| Regresión Logística | 0,836 | 0,794 |
+| Random Forest | 0,809 | 0,551 |
+
+En prueba, XGBoost obtuvo ROC AUC 0,843, recall 0,802, precisión 0,508 y Brier 0,164 con corte 0,5. Con los supuestos económicos del notebook, el umbral que maximizó el valor esperado en validación fue 0,36. Aplicado a prueba, habría recomendado contactar a 744 de 1.409 clientes; el valor neto esperado simulado fue 11.290,50 dólares y el ROI simulado 75,88 %.
+
+## Supuestos de la simulación
+
+El CSV no informa cuánto cuesta una campaña, el margen por cliente ni si una intervención logra retenerlo. Para mostrar el cálculo usé valores de ejemplo: 20 dólares por campaña, seis meses de margen, margen estimado del 40 % y éxito de campaña del 30 %. Por eso el umbral, el valor neto y el ROI son una simulación, no una ganancia real prometida. La matriz de la actividad de clase es otro ejercicio, con sus valores propios.
+
+## Archivos principales
+
+- `data_and_sql/01_modelo_relacional.sql`: crea la base y las tablas.
+- `data_and_sql/02_normalizar_datos.sql`: reparte los datos importados en las cuatro tablas finales.
+- `data_and_sql/consultas_churn.sql`: consultas simples y combinadas.
+- `data_and_sql/clase4_dml_transacciones.sql`: INSERT, UPDATE, DELETE, COMMIT y ROLLBACK.
+- `data_and_sql/05_consultas.sql`: conteos y revisión de relaciones.
+- `notebooks/01_churn_baseline.ipynb`: limpieza y comparación de modelos.
+- `notebooks/02_decision_financiera.ipynb`: umbral económico.
+- `notebooks/03_visualizaciones.py`: gráficos de la clase 5.
+- `informe_tecnico.pdf`: informe con los apartados de la consigna.
+- `pitch_7_diapositivas.pptx`: resumen para la exposición oral.
+
+## Fuente del dataset
+
+Usé el enlace que aparece en el script de descarga de la profesora: [Telco Customer Churn](https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv). El archivo tiene 7.043 filas y 21 columnas.

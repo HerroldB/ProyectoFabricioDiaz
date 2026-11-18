@@ -1,31 +1,27 @@
--- Estas consultas sirven para revisar que las tablas tengan datos.
-USE churn_pp2;
+-- Consultas para comprobar que la carga quedó completa.
+USE churn_db;
 
--- Primero conté los registros de cada tabla.
-SELECT COUNT(*) AS total_clientes FROM dim_customer;
-SELECT COUNT(*) AS total_suscripciones FROM fact_subscription;
+SELECT 'stg_telco' AS tabla, COUNT(*) AS filas FROM stg_telco
+UNION ALL SELECT 'clientes', COUNT(*) FROM clientes
+UNION ALL SELECT 'servicios', COUNT(*) FROM servicios
+UNION ALL SELECT 'facturacion', COUNT(*) FROM facturacion
+UNION ALL SELECT 'registro_churn', COUNT(*) FROM registro_churn;
 
--- Después revisé cuántos clientes se fueron y cuántos se quedaron.
-SELECT
-    CASE WHEN churn = 1 THEN 'Se fue' ELSE 'Se quedó' END AS estado_cliente,
-    COUNT(*) AS cantidad
-FROM fact_subscription
-GROUP BY churn;
+-- Revisé cuántos clientes se fueron y cuántos siguieron.
+SELECT churn, COUNT(*) AS cantidad
+FROM registro_churn
+GROUP BY churn
+ORDER BY churn;
 
--- Comparé las bajas según el tipo de contrato.
-SELECT contract, churn, COUNT(*) AS cantidad
-FROM fact_subscription
-GROUP BY contract, churn
-ORDER BY contract, churn;
+-- Estas tres consultas deberían devolver cero si no quedaron relaciones sueltas.
+SELECT COUNT(*) AS servicios_sin_cliente
+FROM servicios AS s LEFT JOIN clientes AS c ON c.id_cliente = s.id_cliente
+WHERE c.id_cliente IS NULL;
 
--- Revisé el cargo mensual promedio según el estado del cliente.
-SELECT churn, ROUND(AVG(monthly_charges), 2) AS promedio_cargo_mensual
-FROM fact_subscription
-GROUP BY churn;
+SELECT COUNT(*) AS facturas_sin_cliente
+FROM facturacion AS f LEFT JOIN clientes AS c ON c.id_cliente = f.id_cliente
+WHERE c.id_cliente IS NULL;
 
--- Probé también la relación entre el género y el estado de churn.
-SELECT d.gender, f.churn, COUNT(*) AS cantidad
-FROM dim_customer AS d
-JOIN fact_subscription AS f ON d.customer_id = f.customer_id
-GROUP BY d.gender, f.churn
-ORDER BY d.gender, f.churn;
+SELECT COUNT(*) AS churn_sin_cliente
+FROM registro_churn AS r LEFT JOIN clientes AS c ON c.id_cliente = r.id_cliente
+WHERE c.id_cliente IS NULL;

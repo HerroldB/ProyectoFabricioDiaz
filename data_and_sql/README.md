@@ -1,12 +1,13 @@
-# Archivos para MySQL Workbench
+# Archivos de MySQL Workbench
 
-Para cargar la base, seguí este orden:
+## Orden de uso
 
-1. Ejecutá `01_modelo_relacional.sql` para crear la base `churn_pp2` y sus dos tablas.
-2. Ejecutá `02_cargar_dim_customer.sql` para cargar los datos básicos de los 7.043 clientes.
-3. Ejecutá `03_cargar_fact_subscription_1.sql` y `04_cargar_fact_subscription_2.sql` para cargar las 7.043 suscripciones.
-4. Ejecutá `05_consultas.sql` para revisar los conteos y algunos datos.
+1. Ejecuté `01_modelo_relacional.sql` para crear la base `churn_db`, la tabla temporal `stg_telco` y las cuatro tablas finales.
+2. Importé `Telco_Customer_Churn.csv` en `stg_telco` con **Table Data Import Wizard** de MySQL Workbench. Los encabezados del CSV coinciden con las columnas de esa tabla.
+3. Ejecuté `02_normalizar_datos.sql` para separar los datos en `clientes`, `servicios`, `facturacion` y `registro_churn`.
+4. Ejecuté `05_consultas.sql` para revisar los conteos y las claves foráneas.
+5. Ejecuté `consultas_churn.sql` y `clase4_dml_transacciones.sql` para las prácticas de SQL.
 
-El archivo `Telco_Customer_Churn.csv` es el CSV original indicado en el script de la cátedra. Los scripts de carga ya tienen los registros acomodados para las tablas. En las 11 filas donde `TotalCharges` venía vacío, guardé 0 porque esos clientes tenían `tenure = 0`. En `churn`, usé 1 para “se fue” y 0 para “se quedó”.
+Después de importar y normalizar, espero ver 7.043 filas en cada una de las cuatro tablas finales. En `registro_churn` espero 1.869 filas con `Yes` y 5.174 con `No`.
 
-El diagrama `diagrama_entidad_relacion.svg` muestra la relación entre las dos tablas.
+`stg_telco` conserva la importación original. `INSERT IGNORE` evita que una segunda ejecución de la normalización duplique los clientes.

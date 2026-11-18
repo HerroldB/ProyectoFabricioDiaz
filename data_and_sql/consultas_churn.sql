@@ -1,53 +1,43 @@
--- PP2 · Clase 3 · Consultas sobre Telco Customer Churn.
--- fact_subscription reúne la facturación y dim_customer contiene los datos del cliente.
-USE churn_pp2;
+-- Prácticas de consultas con las tablas del proyecto.
+USE churn_db;
 
--- 1. Mostrar solo identificador, género e indicador de adulto mayor.
-SELECT
-    customer_id AS cliente_id,
-    gender AS genero_cliente,
-    senior_citizen AS adulto_mayor
-FROM dim_customer;
+-- 1. Elegí algunas columnas para revisar los datos del cliente.
+SELECT id_cliente AS cliente_id, genero, adulto_mayor
+FROM clientes
+LIMIT 10;
 
--- 2. Buscar clientes con un cargo mensual superior a 70.
-SELECT
-    customer_id AS cliente_id,
-    contract AS tipo_contrato,
-    monthly_charges AS cargo_mensual
-FROM fact_subscription
-WHERE monthly_charges > 70.00;
+-- 2. Busqué cargos mensuales superiores a 70.
+SELECT id_cliente AS cliente_id, tipo_contrato, cargo_mensual
+FROM facturacion
+WHERE cargo_mensual > 70.00;
 
--- 3a. Combinar contrato mensual con cargo superior a 50.
-SELECT
-    customer_id AS cliente_id,
-    contract AS tipo_contrato,
-    monthly_charges AS cargo_mensual
-FROM fact_subscription
-WHERE contract = 'Month-to-month' AND monthly_charges > 50.00;
+-- 3a. Busqué clientes mensuales con cargo superior a 50.
+SELECT id_cliente AS cliente_id, tipo_contrato, cargo_mensual
+FROM facturacion
+WHERE tipo_contrato = 'Month-to-month' AND cargo_mensual > 50.00;
 
--- 3b. Incluir también a quienes pagan con cheque electrónico.
-SELECT
-    customer_id AS cliente_id,
-    contract AS tipo_contrato,
-    monthly_charges AS cargo_mensual,
-    payment_method AS metodo_pago
-FROM fact_subscription
-WHERE (contract = 'Month-to-month' AND monthly_charges > 50.00)
-   OR payment_method = 'Electronic check';
+-- 3b. También agregué quienes pagan con cheque electrónico.
+SELECT id_cliente AS cliente_id, tipo_contrato, cargo_mensual, metodo_pago
+FROM facturacion
+WHERE (tipo_contrato = 'Month-to-month' AND cargo_mensual > 50.00)
+   OR metodo_pago = 'Electronic check';
 
--- 4. Filtrar medios de pago electrónicos y ordenar por cargo mensual.
-SELECT
-    customer_id AS cliente_id,
-    payment_method AS metodo_pago,
-    monthly_charges AS cargo_mensual
-FROM fact_subscription
-WHERE payment_method LIKE '%Electronic%'
-ORDER BY monthly_charges DESC, customer_id;
+-- 4. Usé LIKE para buscar el texto Electronic y ordené por cargo.
+SELECT id_cliente AS cliente_id, metodo_pago, cargo_mensual
+FROM facturacion
+WHERE metodo_pago LIKE '%Electronic%'
+ORDER BY cargo_mensual DESC, id_cliente;
 
--- 5. Mostrar los cinco mayores cargos acumulados.
-SELECT
-    customer_id AS cliente_id,
-    total_charges AS cargo_total
-FROM fact_subscription
-ORDER BY total_charges DESC, customer_id
+-- 5. Mostré los cinco cargos acumulados más altos.
+SELECT id_cliente AS cliente_id, cargo_total
+FROM facturacion
+ORDER BY cargo_total DESC, id_cliente
 LIMIT 5;
+
+-- 6. Conté las bajas por tipo de contrato.
+SELECT f.tipo_contrato, COUNT(*) AS clientes_que_se_fueron
+FROM facturacion AS f
+JOIN registro_churn AS r ON r.id_cliente = f.id_cliente
+WHERE r.churn = 'Yes'
+GROUP BY f.tipo_contrato
+ORDER BY clientes_que_se_fueron DESC;

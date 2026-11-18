@@ -1,82 +1,87 @@
--- PP2 · Clase 4 · DML y transacciones en MySQL Workbench.
--- En churn_pp2, fact_subscription reúne servicios, facturación y churn.
--- Su clave primaria y foránea es customer_id, asignado por dim_customer.
--- Ejecutá cada bloque completo en la misma conexión. Todos cierran con ROLLBACK.
-USE churn_pp2;
+-- PP2 - Clase 4 - INSERT, UPDATE, DELETE y transacciones.
+USE churn_db;
 
--- 1. Alta de prueba. Este identificador debe estar libre antes de ejecutar.
+-- Si antes quedó una prueba interrumpida, la limpié antes de empezar.
 START TRANSACTION;
+DELETE FROM registro_churn WHERE id_cliente = '9999-NEWCL';
+DELETE FROM facturacion WHERE id_cliente = '9999-NEWCL';
+DELETE FROM servicios WHERE id_cliente = '9999-NEWCL';
+DELETE FROM clientes WHERE id_cliente = '9999-NEWCL';
+COMMIT;
 
-INSERT INTO dim_customer
-    (customer_id, gender, senior_citizen, partner, dependents)
-VALUES
-    ('9999-NEWCL', 'Female', 0, 'Yes', 'No');
+-- 1. Agregué un cliente de prueba y sus registros relacionados.
+INSERT INTO clientes (id_cliente, genero, adulto_mayor, pareja, dependientes)
+VALUES ('9999-NEWCL', 'Female', 0, 'Yes', 'No');
 
-INSERT INTO fact_subscription
-    (customer_id, contract, monthly_charges, total_charges, churn)
-VALUES
-    ('9999-NEWCL', 'Month-to-month', 85.50, 85.50, 0);
+-- No indiqué id_servicio: MySQL lo creó con AUTO_INCREMENT.
+INSERT INTO servicios (id_cliente, antiguedad_meses, servicio_telefonico)
+VALUES ('9999-NEWCL', 0, 'Yes');
 
-SELECT
-    d.customer_id AS cliente_id,
-    d.gender AS genero,
-    d.senior_citizen AS adulto_mayor,
-    d.partner AS pareja,
-    d.dependents AS dependientes,
-    f.contract AS tipo_contrato,
-    f.monthly_charges AS cargo_mensual,
-    f.total_charges AS cargo_total
-FROM dim_customer AS d
-JOIN fact_subscription AS f ON d.customer_id = f.customer_id
-WHERE d.customer_id = '9999-NEWCL';
+INSERT INTO facturacion
+    (id_cliente, tipo_contrato, facturacion_digital, metodo_pago,
+     cargo_mensual, cargo_total)
+VALUES ('9999-NEWCL', 'Month-to-month', 'Yes', 'Electronic check', 85.50, 85.50);
 
+INSERT INTO registro_churn (id_cliente, churn)
+VALUES ('9999-NEWCL', 'No');
+
+SELECT c.id_cliente, c.genero, s.id_servicio, f.tipo_contrato,
+       f.cargo_mensual, r.churn
+FROM clientes AS c
+JOIN servicios AS s ON s.id_cliente = c.id_cliente
+JOIN facturacion AS f ON f.id_cliente = c.id_cliente
+JOIN registro_churn AS r ON r.id_cliente = c.id_cliente
+WHERE c.id_cliente = '9999-NEWCL';
+
+-- 2. Aumenté 10% los cargos de contrato mensual para probar UPDATE.
+-- Miré antes y después un cliente; luego ROLLBACK devolvió el valor original.
+SET @id_facturacion_prueba = (
+    SELECT id_facturacion
+    FROM facturacion
+    WHERE id_cliente = '9999-NEWCL'
+);
+
+START TRANSACTION;
+SELECT id_cliente, cargo_mensual AS antes
+FROM facturacion
+WHERE id_facturacion = @id_facturacion_prueba;
+
+UPDATE facturacion
+SET cargo_mensual = ROUND(cargo_mensual * 1.10, 2)
+WHERE id_facturacion > 0 AND tipo_contrato = 'Month-to-month';
+
+SELECT id_cliente, cargo_mensual AS con_aumento
+FROM facturacion
+WHERE id_facturacion = @id_facturacion_prueba;
 ROLLBACK;
 
--- 2. Simular un aumento del 10 % y comprobar que se revierte.
+SELECT id_cliente, cargo_mensual AS despues_de_rollback
+FROM facturacion
+WHERE id_facturacion = @id_facturacion_prueba;
+
+-- 3. Revisé un registro de baja antes de borrarlo.
+-- Usé este identificador del CSV y revertí el borrado con ROLLBACK.
 START TRANSACTION;
+SELECT id_cliente, churn
+FROM registro_churn
+WHERE id_cliente = '8361-LTMKD' AND churn = 'Yes';
 
-SELECT 'Antes' AS etapa, customer_id AS cliente_id, monthly_charges AS cargo_mensual
-FROM fact_subscription
-WHERE customer_id = '7590-VHVEG' AND contract = 'Month-to-month';
+DELETE FROM registro_churn
+WHERE id_registro > 0 AND id_cliente = '8361-LTMKD' AND churn = 'Yes';
 
--- Workbench suele proteger las actualizaciones que filtran por una columna sin índice.
--- La excepción rige solo para esta sesión y se restaura inmediatamente.
-SET @pp2_safe_updates = @@SESSION.sql_safe_updates;
-SET SESSION sql_safe_updates = 0;
-
-UPDATE fact_subscription
-SET monthly_charges = ROUND(monthly_charges * 1.10, 2)
-WHERE contract = 'Month-to-month';
-
-SET SESSION sql_safe_updates = @pp2_safe_updates;
-
-SELECT 'Con aumento' AS etapa, customer_id AS cliente_id, monthly_charges AS cargo_mensual
-FROM fact_subscription
-WHERE customer_id = '7590-VHVEG' AND contract = 'Month-to-month';
-
+SELECT COUNT(*) AS filas_despues_del_delete
+FROM registro_churn
+WHERE id_cliente = '8361-LTMKD';
 ROLLBACK;
 
-SELECT 'Tras ROLLBACK' AS etapa, customer_id AS cliente_id, monthly_charges AS cargo_mensual
-FROM fact_subscription
-WHERE customer_id = '7590-VHVEG' AND contract = 'Month-to-month';
+SELECT COUNT(*) AS filas_despues_del_rollback
+FROM registro_churn
+WHERE id_cliente = '8361-LTMKD';
 
--- 3. Validar y simular el borrado de una suscripción con baja.
--- La tabla guarda también los cargos y servicios de esa fila, por eso se revierte.
+-- Borré el cliente de prueba y sus datos para no dejarlo en la base final.
 START TRANSACTION;
-
-SELECT customer_id AS cliente_id, churn AS baja
-FROM fact_subscription
-WHERE customer_id = '8361-LTMKD' AND churn = 1;
-
-DELETE FROM fact_subscription
-WHERE customer_id = '8361-LTMKD' AND churn = 1;
-
-SELECT COUNT(*) AS filas_tras_delete
-FROM fact_subscription
-WHERE customer_id = '8361-LTMKD' AND churn = 1;
-
-ROLLBACK;
-
-SELECT COUNT(*) AS filas_tras_rollback
-FROM fact_subscription
-WHERE customer_id = '8361-LTMKD' AND churn = 1;
+DELETE FROM registro_churn WHERE id_cliente = '9999-NEWCL';
+DELETE FROM facturacion WHERE id_cliente = '9999-NEWCL';
+DELETE FROM servicios WHERE id_cliente = '9999-NEWCL';
+DELETE FROM clientes WHERE id_cliente = '9999-NEWCL';
+COMMIT;
